@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mr_nav2</name>
+  <version>0.0.0</version>
+  <description>nav2 launches for mobile robotics</description>
+  <maintainer email="markus.bader@tuwien.ac.at">Markus Bader</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rviz2</depend>
+  <depend>navigation2</depend>
+  <depend>nav2_common</depend>
+  <depend>slam_toolbox</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

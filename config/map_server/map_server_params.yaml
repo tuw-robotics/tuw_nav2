@@ -1,0 +1,6 @@
+map_server:
+  ros__parameters:
+    frame_id: map   
+    topic_name: map
+    use_sim_time: false
+    yaml_filename: "./ws02/src/mr_nav/config/map/cave/map.yaml"
