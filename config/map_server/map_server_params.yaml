@@ -3,4 +3,4 @@ map_server:
     frame_id: map   
     topic_name: map
     use_sim_time: false
-    yaml_filename: "./ws02/src/mr_nav/config/map/cave/map.yaml"
+    yaml_filename: "./ws02/src/mr_nav2/config/map/cave/map.yaml"
