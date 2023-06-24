@@ -1,6 +1,6 @@
 scan_to_scan_filter_chain:
   ros__parameters:
-    RobotBody:
+    filter1:
       name: box
       type: laser_filters/LaserScanBoxFilter
       params:
@@ -11,7 +11,7 @@ scan_to_scan_filter_chain:
         max_y: 0.15
         min_z: -1.0
         max_z: 1.0
-    Shadow:
+    filter2:
       name: shadows
       type: laser_filters/ScanShadowsFilter
       params:
