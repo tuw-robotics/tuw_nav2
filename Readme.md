@@ -4,12 +4,13 @@
 
 ### teleop joy 
 ```
-ros2 launch teleop_twist_joy teleop-launch.py  config_filepath:=$MR_DIR/ws02/src/tuw_nav2/config/teleop_twist_joy/f710.yaml
+cd $WORKSPACE
+ros2 launch teleop_twist_joy teleop-launch.py  config_filepath:=$WORKSPACE/src/tuw_nav2/config/teleop_twist_joy/f710.yaml
 ```
 
 ### slam
 ```
-ros2 launch slam_toolbox online_async_launch.py slam_params_file:=$MR_DIR/ws02/src/tuw_nav2/config/slam_toolbox/mapper_params_online_async.yaml
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=$WORKSPACE/src/tuw_nav2/config/slam_toolbox/mapper_params_online_async.yaml
 ```
 
 ### map save 
@@ -34,6 +35,6 @@ ros2 run mouse_teleop mouse_teleop --ros-args --remap mouse_vel:=cmd_vel
 ```
 ros2 launch tuw_nav2 rviz_launch.py
 ros2 launch tuw_nav2 laser_filter.launch.py
-ros2 launch tuw_nav2 localization_launch.py map:=$MRRP2_DIR/ws02/install/tuw_nav2/share/tuw_nav2/config/map/cave/map.yaml
+ros2 launch tuw_nav2 localization_launch.py map:=$WORKSPACE/install/tuw_nav2/share/tuw_nav2/config/map/cave/map.yaml
 ros2 launch tuw_nav2 navigation_launch.py
 ```
