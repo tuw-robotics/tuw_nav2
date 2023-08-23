@@ -1,0 +1,30 @@
+##enable named panes in tmux.conf with:
+#set -g pane-border-format "#{pane_index} #{pane_title}"
+#set -g pane-border-status bottom
+
+
+name: p3dx
+root: /opt/greenhive
+
+windows:
+  - simulation:
+      layout: even-vertical
+      panes: 
+        - gazebo: 
+          - printf '\033]2;%s\033\\' 'gazebo'
+          - ros2 launch tuw_gazebo world.launch.py room:=cave
+        - robot description: 
+          - printf '\033]2;%s\033\\' 'robot description'
+          - sleep 5; ros2 launch tuw_gazebo_models spawn_robot.launch.py model_name:=robot0  robot:=pioneer3dx  X:=-6.0 Y:=-6.0 Theta:=0.7
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_launch.py
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_launch.py map:=./ws02/install/tuw_nav2/share/tuw_nav2/config/maps/cave/map.yaml
+        - nav2: 
+          - printf '\033]2;%s\033\\' 'map server'
+          - read -p "start nav2"; ros2 launch tuw_nav2 navigation_launch.py
