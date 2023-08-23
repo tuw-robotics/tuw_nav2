@@ -29,15 +29,14 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description():
     # Get the launch directory
     bringup_dir = get_package_share_directory('tuw_nav2')
-
+  
+    amcl_yaml        = os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'amcl.yaml'),
+    
     namespace = LaunchConfiguration('namespace')
     map_yaml_file = LaunchConfiguration('map')
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     params_file = LaunchConfiguration('params_file')
-    use_composition = LaunchConfiguration('use_composition')
-    container_name = LaunchConfiguration('container_name')
-    use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
 
     lifecycle_nodes = ['map_server', 'amcl']
@@ -88,31 +87,17 @@ def generate_launch_description():
         'autostart', default_value='true',
         description='Automatically startup the nav2 stack')
 
-    declare_use_composition_cmd = DeclareLaunchArgument(
-        'use_composition', default_value='False',
-        description='Use composed bringup if True')
-
-    declare_container_name_cmd = DeclareLaunchArgument(
-        'container_name', default_value='nav2_container',
-        description='the name of conatiner that nodes will load in if use composition')
-
-    declare_use_respawn_cmd = DeclareLaunchArgument(
-        'use_respawn', default_value='False',
-        description='Whether to respawn if a node crashes. Applied when composition is disabled.')
-
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
 
     load_nodes = GroupAction(
-        condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
             Node(
                 package='nav2_map_server',
                 executable='map_server',
                 name='map_server',
                 output='screen',
-                respawn=use_respawn,
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
@@ -122,9 +107,8 @@ def generate_launch_description():
                 executable='amcl',
                 name='amcl',
                 output='screen',
-                respawn=use_respawn,
                 respawn_delay=2.0,
-                parameters=[configured_params],
+                parameters=[amcl_yaml],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -139,32 +123,6 @@ def generate_launch_description():
         ]
     )
 
-    load_composable_nodes = LoadComposableNodes(
-        condition=IfCondition(use_composition),
-        target_container=container_name,
-        composable_node_descriptions=[
-            ComposableNode(
-                package='nav2_map_server',
-                plugin='nav2_map_server::MapServer',
-                name='map_server',
-                parameters=[configured_params],
-                remappings=remappings),
-            ComposableNode(
-                package='nav2_amcl',
-                plugin='nav2_amcl::AmclNode',
-                name='amcl',
-                parameters=[configured_params],
-                remappings=remappings),
-            ComposableNode(
-                package='nav2_lifecycle_manager',
-                plugin='nav2_lifecycle_manager::LifecycleManager',
-                name='lifecycle_manager_localization',
-                parameters=[{'use_sim_time': use_sim_time,
-                             'autostart': autostart,
-                             'node_names': lifecycle_nodes}]),
-        ],
-    )
-
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -177,13 +135,9 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
-    ld.add_action(declare_use_composition_cmd)
-    ld.add_action(declare_container_name_cmd)
-    ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
 
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(load_nodes)
-    ld.add_action(load_composable_nodes)
 
     return ld

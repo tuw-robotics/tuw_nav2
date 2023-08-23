@@ -25,6 +25,14 @@ windows:
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
           - ros2 launch tuw_nav2 localization_launch.py map:=./ws02/install/tuw_nav2/share/tuw_nav2/config/maps/cave/map.yaml
-        - nav2: 
-          - printf '\033]2;%s\033\\' 'map server'
-          - read -p "start nav2"; ros2 launch tuw_nav2 navigation_launch.py
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - #read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py
+  - navigation:
+      layout: even-vertical
+      panes: 
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py
+        - debug: 
+          -
