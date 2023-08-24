@@ -23,51 +23,47 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
-from nav2_common.launch import RewrittenYaml
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
+
 
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('tuw_nav2')
+    this_pgk_dir = get_package_share_directory('tuw_nav2')
   
-    amcl_yaml        = os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'amcl.yaml'),
-    map_server_yaml  = os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'map_server.yaml'),
-    
-    namespace = LaunchConfiguration('namespace')
-    map_yaml_file = LaunchConfiguration('map')
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
 
     lifecycle_nodes = ['map_server', 'amcl']
 
-    # Map fully qualified names to relative ones so the node's namespace can be prepended.
-    # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
-    # https://github.com/ros/geometry2/issues/32
-    # https://github.com/ros/robot_state_publisher/pull/30
-    # TODO(orduno) Substitute with `PushNodeRemapping`
-    #              https://github.com/ros2/launch_ros/issues/56
     remappings = [('/tf', 'tf'),
                   ('/tf_static', 'tf_static')]
 
-    # Create our own temporary YAML files that include substitutions
-    param_substitutions = {
-        'use_sim_time': use_sim_time}
+    declare_amcl_yaml = DeclareLaunchArgument(
+        'amcl_yaml',
+        default_value='amcl.yaml',
+        description='amcl parameter file name')
 
-    map_server_yaml_rewritten = RewrittenYaml(
-        source_file=map_server_yaml,
-        root_key=namespace,
-        param_rewrites=param_substitutions,
-        convert_types=True)
-
-    declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace',
-        default_value='',
-        description='Top-level namespace')
-
-    declare_map_yaml_cmd = DeclareLaunchArgument(
-        'map',
-        description='Full path to map yaml file to load')
+    declare_init_pose_yaml = DeclareLaunchArgument(
+        'init_pose_yaml',
+        default_value='init_pose.yaml',
+        description='amcl init pose parameter file name')
+    
+    declare_map_yaml = DeclareLaunchArgument(
+        'map_yaml',
+        default_value='map.yaml',
+        description='map yaml file name')
+    
+    declare_robot_used = DeclareLaunchArgument(
+        'robot_used',
+        default_value='pioneer3dx',
+        description='Robot used and configuration folder used: ./amcl/$robot_used/$parameters_used/..')
+    
+    declare_environment_used = DeclareLaunchArgument(
+        'environment_used',
+        default_value='cave',
+        description='Map file used: /maps/$environment_used/map.yaml')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
@@ -82,6 +78,32 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
 
+
+    def create_full_path_configurations(context):
+        amcl_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'amcl',
+            context.launch_configurations['robot_used'],
+            context.launch_configurations['amcl_yaml'])
+        print(amcl_param_file_path)
+        amcl_init_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'amcl',
+            context.launch_configurations['robot_used'],
+            context.launch_configurations['init_pose_yaml'])
+        print(amcl_init_param_file_path)
+        particle_filter_map_file_path = os.path.join(
+            this_pgk_dir,
+            'config','maps',
+            context.launch_configurations['environment_used'],
+            context.launch_configurations['map_yaml'])
+        print(particle_filter_map_file_path)
+        return [SetLaunchConfiguration('amcl_param_file_path', amcl_param_file_path),
+                SetLaunchConfiguration('amcl_init_param_file_path', amcl_init_param_file_path),
+                SetLaunchConfiguration('particle_filter_map_file_path', particle_filter_map_file_path)]
+
+    create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
+
     load_nodes = GroupAction(
         actions=[
             Node(
@@ -90,8 +112,8 @@ def generate_launch_description():
                 name='map_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[map_server_yaml_rewritten,
-                            {'yaml_filename': map_yaml_file}],
+                parameters=[{'use_sim_time': use_sim_time},
+                            {'yaml_filename': LaunchConfiguration('particle_filter_map_file_path')}],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -100,7 +122,9 @@ def generate_launch_description():
                 name='amcl',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[amcl_yaml],
+                parameters=[LaunchConfiguration('amcl_param_file_path'),
+                            LaunchConfiguration('amcl_init_param_file_path'),
+                            {'use_sim_time': use_sim_time}],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -119,12 +143,15 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Declare the launch options
-    ld.add_action(declare_namespace_cmd)
-    ld.add_action(declare_map_yaml_cmd)
+    ld.add_action(declare_amcl_yaml)
+    ld.add_action(declare_init_pose_yaml)
+    ld.add_action(declare_map_yaml)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
-
+    ld.add_action(declare_robot_used)
+    ld.add_action(declare_environment_used)
+    ld.add_action(create_full_path_configurations_arg)
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(load_nodes)
 

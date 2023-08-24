@@ -24,7 +24,7 @@ windows:
           - ros2 launch tuw_nav2 rviz_launch.py
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py map:=./ws02/install/tuw_nav2/share/tuw_nav2/config/maps/cave/map.yaml
+          - ros2 launch tuw_nav2 localization_launch.py 
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py
