@@ -8,7 +8,7 @@ root: /opt/greenhive
 
 windows:
   - simulation:
-      layout: even-vertical
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
       panes: 
         - gazebo: 
           - printf '\033]2;%s\033\\' 'gazebo'
@@ -27,12 +27,5 @@ windows:
           - ros2 launch tuw_nav2 localization_launch.py map:=./ws02/install/tuw_nav2/share/tuw_nav2/config/maps/cave/map.yaml
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
-          - #read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py
-  - navigation:
-      layout: even-vertical
-      panes: 
-        - navigation: 
-          - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py
-        - debug: 
-          -
+          

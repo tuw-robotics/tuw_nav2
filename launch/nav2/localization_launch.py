@@ -31,12 +31,12 @@ def generate_launch_description():
     bringup_dir = get_package_share_directory('tuw_nav2')
   
     amcl_yaml        = os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'amcl.yaml'),
+    map_server_yaml  = os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'map_server.yaml'),
     
     namespace = LaunchConfiguration('namespace')
     map_yaml_file = LaunchConfiguration('map')
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
-    params_file = LaunchConfiguration('params_file')
     log_level = LaunchConfiguration('log_level')
 
     lifecycle_nodes = ['map_server', 'amcl']
@@ -52,17 +52,13 @@ def generate_launch_description():
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {
-        'use_sim_time': use_sim_time,
-        'yaml_filename': map_yaml_file}
+        'use_sim_time': use_sim_time}
 
-    configured_params = RewrittenYaml(
-        source_file=params_file,
+    map_server_yaml_rewritten = RewrittenYaml(
+        source_file=map_server_yaml,
         root_key=namespace,
         param_rewrites=param_substitutions,
         convert_types=True)
-
-    stdout_linebuf_envvar = SetEnvironmentVariable(
-        'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
 
     declare_namespace_cmd = DeclareLaunchArgument(
         'namespace',
@@ -78,14 +74,9 @@ def generate_launch_description():
         default_value='false',
         description='Use simulation (Gazebo) clock if true')
 
-    declare_params_file_cmd = DeclareLaunchArgument(
-        'params_file',
-        default_value=os.path.join(bringup_dir, 'config', 'nav2', 'pioneer3dx', 'nav2_params.yaml'),
-        description='Full path to the ROS2 parameters file to use for all launched nodes')
-
     declare_autostart_cmd = DeclareLaunchArgument(
         'autostart', default_value='true',
-        description='Automatically startup the nav2 stack')
+        description='Automatically startup the localization stack')
 
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info',
@@ -99,7 +90,8 @@ def generate_launch_description():
                 name='map_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[configured_params],
+                parameters=[map_server_yaml_rewritten,
+                            {'yaml_filename': map_yaml_file}],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -126,14 +118,10 @@ def generate_launch_description():
     # Create the launch description and populate
     ld = LaunchDescription()
 
-    # Set environment variables
-    ld.add_action(stdout_linebuf_envvar)
-
     # Declare the launch options
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_map_yaml_cmd)
     ld.add_action(declare_use_sim_time_cmd)
-    ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
 
