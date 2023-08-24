@@ -24,6 +24,7 @@ from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from nav2_common.launch import RewrittenYaml
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
 
 
 def generate_launch_description():
@@ -36,15 +37,7 @@ def generate_launch_description():
     params_file = LaunchConfiguration('params_file')
     log_level = LaunchConfiguration('log_level')
 
-    behavior_server_yaml          = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'behavior_server.yaml'),
-    bt_navigator_yaml          = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'bt_navigator.yaml'),
-    #controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_dwb.yaml'),
-    controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_mppi.yaml'),
-    controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_purepursuite.yaml'),
-    smoother_server_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'smoother_server.yaml'),
-    waypoint_follower_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'waypoint_follower.yaml'),
-    planner_server_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'planner_server.yaml'),
-    velocity_smoother_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'velocity_smoother.yaml'),
+    bt_navigator_yaml          = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'bt_navigator.yaml')
      
 
     lifecycle_nodes = ['controller_server',
@@ -55,12 +48,6 @@ def generate_launch_description():
                        'waypoint_follower',
                        'velocity_smoother']
 
-    # Map fully qualified names to relative ones so the node's namespace can be prepended.
-    # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
-    # https://github.com/ros/geometry2/issues/32
-    # https://github.com/ros/robot_state_publisher/pull/30
-    # TODO(orduno) Substitute with `PushNodeRemapping`
-    #              https://github.com/ros2/launch_ros/issues/56
     remappings = [('/tf', 'tf'),
                   ('/tf_static', 'tf_static')]
 
@@ -76,10 +63,46 @@ def generate_launch_description():
             convert_types=True)
 
 
-    declare_robot_used = DeclareLaunchArgument(
-        'robot_used',
+    declare_controller_server_yaml = DeclareLaunchArgument(
+        'controller_server_yaml',
+        default_value='controller_server_purepursuite.yaml',
+        description='controller server file name')
+
+
+    declare_smoother_server_yaml = DeclareLaunchArgument(
+        'smoother_server_yaml',
+        default_value='smoother_server.yaml',
+        description='smoother server file name')
+
+    declare_behavior_server_yaml = DeclareLaunchArgument(
+        'behavior_server_yaml',
+        default_value='behavior_server.yaml',
+        description='behavior server file name')
+    
+    declare_waypoint_follower_yaml = DeclareLaunchArgument(
+        'waypoint_follower_yaml',
+        default_value='waypoint_follower.yaml',
+        description='waypoint follower file name')
+
+    declare_planner_server_yaml = DeclareLaunchArgument(
+        'planner_server_yaml',
+        default_value='planner_server.yaml',
+        description='planner server file name')
+    
+    declare_velocity_smoother_yaml = DeclareLaunchArgument(
+        'velocity_smoother_yaml',
+        default_value='velocity_smoother.yaml',
+        description='velocity smoother file name')
+    
+    declare_use_robot = DeclareLaunchArgument(
+        'use_robot',
         default_value='pioneer3dx',
-        description='Robot used and configuration folder used: ./amcl/$robot_used/$parameters_used/..')
+        description='Robot used and configuration folder used: ./nav2/$use_robot/$use_version/..')
+
+    declare_use_version = DeclareLaunchArgument(
+        'use_version',
+        default_value='v1',
+        description='Robot used and configuration folder used: ./nav2/$use_robot/$use_version/..')
 
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
@@ -102,6 +125,59 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
 
+    def create_full_path_configurations(context):
+        controller_server_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['controller_server_yaml'])
+        print(controller_server_param_file_path)
+        behavior_server_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['behavior_server_yaml'])
+        print(behavior_server_param_file_path)
+        smoother_server_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['smoother_server_yaml'])
+        print(smoother_server_param_file_path)
+        waypoint_follower_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['waypoint_follower_yaml'])
+        print(waypoint_follower_param_file_path)
+        planner_server_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['planner_server_yaml'])
+        print(planner_server_param_file_path)
+        velocity_smoother_param_file_path = os.path.join(
+            this_pgk_dir,
+            'config', 'nav2',
+            context.launch_configurations['use_robot'],
+            context.launch_configurations['use_version'],
+            context.launch_configurations['velocity_smoother_yaml'])
+        print(velocity_smoother_param_file_path)
+        return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_file_path),
+                SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_file_path),
+                SetLaunchConfiguration('smoother_server_param_file_path', smoother_server_param_file_path),
+                SetLaunchConfiguration('waypoint_follower_param_file_path', waypoint_follower_param_file_path),
+                SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_file_path),
+                SetLaunchConfiguration('velocity_smoother_param_file_path', velocity_smoother_param_file_path)]
+
+    create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
+
+
     load_nodes = GroupAction(
         actions=[
             Node(
@@ -109,7 +185,7 @@ def generate_launch_description():
                 executable='controller_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[controller_server_yaml],
+                parameters=[LaunchConfiguration('controller_server_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
             Node(
@@ -118,7 +194,7 @@ def generate_launch_description():
                 name='smoother_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[smoother_server_yaml],
+                parameters=[LaunchConfiguration('smoother_server_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -127,7 +203,7 @@ def generate_launch_description():
                 name='planner_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[planner_server_yaml],
+                parameters=[LaunchConfiguration('planner_server_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -136,7 +212,7 @@ def generate_launch_description():
                 name='behavior_server',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[behavior_server_yaml],
+                parameters=[LaunchConfiguration('behavior_server_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -154,7 +230,7 @@ def generate_launch_description():
                 name='waypoint_follower',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[waypoint_follower_yaml],
+                parameters=[LaunchConfiguration('waypoint_follower_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -163,7 +239,7 @@ def generate_launch_description():
                 name='velocity_smoother',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[velocity_smoother_yaml],
+                parameters=[LaunchConfiguration('velocity_smoother_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
                         [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
@@ -186,12 +262,23 @@ def generate_launch_description():
     ld.add_action(stdout_linebuf_envvar)
 
     # Declare the launch options
-    ld.add_action(declare_robot_used)
+    ld.add_action(declare_use_robot)
+    ld.add_action(declare_use_version)
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_use_sim_time_cmd)
+    ld.add_action(declare_controller_server_yaml)
+    ld.add_action(declare_behavior_server_yaml)
+    ld.add_action(declare_smoother_server_yaml)
+    ld.add_action(declare_waypoint_follower_yaml)
+    ld.add_action(declare_planner_server_yaml)
+    ld.add_action(declare_velocity_smoother_yaml)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_log_level_cmd)
     
+    #Opaque function call
+    ld.add_action(create_full_path_configurations_arg)
+
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
 

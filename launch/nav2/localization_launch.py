@@ -151,7 +151,10 @@ def generate_launch_description():
     ld.add_action(declare_log_level_cmd)
     ld.add_action(declare_use_robot)
     ld.add_action(declare_use_environment)
+
+    #Opaque function call
     ld.add_action(create_full_path_configurations_arg)
+    
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(load_nodes)
 
