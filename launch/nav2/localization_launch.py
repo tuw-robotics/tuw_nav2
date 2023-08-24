@@ -55,15 +55,15 @@ def generate_launch_description():
         default_value='map.yaml',
         description='map yaml file name')
     
-    declare_robot_used = DeclareLaunchArgument(
-        'robot_used',
+    declare_use_robot = DeclareLaunchArgument(
+        'use_robot',
         default_value='pioneer3dx',
-        description='Robot used and configuration folder used: ./amcl/$robot_used/$parameters_used/..')
+        description='Robot used and configuration folder used: ./amcl/$use_robot/$parameters_used/..')
     
-    declare_environment_used = DeclareLaunchArgument(
-        'environment_used',
+    declare_use_environment = DeclareLaunchArgument(
+        'use_environment',
         default_value='cave',
-        description='Map file used: /maps/$environment_used/map.yaml')
+        description='Map file used: /maps/$use_environment/map.yaml')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
@@ -83,19 +83,19 @@ def generate_launch_description():
         amcl_param_file_path = os.path.join(
             this_pgk_dir,
             'config', 'amcl',
-            context.launch_configurations['robot_used'],
+            context.launch_configurations['use_robot'],
             context.launch_configurations['amcl_yaml'])
         print(amcl_param_file_path)
         amcl_init_param_file_path = os.path.join(
             this_pgk_dir,
             'config', 'amcl',
-            context.launch_configurations['robot_used'],
+            context.launch_configurations['use_robot'],
             context.launch_configurations['init_pose_yaml'])
         print(amcl_init_param_file_path)
         particle_filter_map_file_path = os.path.join(
             this_pgk_dir,
             'config','maps',
-            context.launch_configurations['environment_used'],
+            context.launch_configurations['use_environment'],
             context.launch_configurations['map_yaml'])
         print(particle_filter_map_file_path)
         return [SetLaunchConfiguration('amcl_param_file_path', amcl_param_file_path),
@@ -149,8 +149,8 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
-    ld.add_action(declare_robot_used)
-    ld.add_action(declare_environment_used)
+    ld.add_action(declare_use_robot)
+    ld.add_action(declare_use_environment)
     ld.add_action(create_full_path_configurations_arg)
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(load_nodes)

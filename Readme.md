@@ -35,6 +35,6 @@ ros2 run mouse_teleop mouse_teleop --ros-args --remap mouse_vel:=cmd_vel
 ```
 ros2 launch tuw_nav2 rviz_launch.py
 ros2 launch tuw_nav2 laser_filter.launch.py
-ros2 launch tuw_nav2 localization_launch.py map:=$WORKSPACE/install/tuw_nav2/share/tuw_nav2/config/maps/cave/map.yaml
+ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
 ros2 launch tuw_nav2 navigation_launch.py
 ```
