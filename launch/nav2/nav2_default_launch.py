@@ -36,13 +36,20 @@ def generate_launch_description():
     log_level = LaunchConfiguration('log_level')
      
 
-    declare_controller_server_yaml = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
-    declare_bt_navigator_yaml      = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
-    declare_smoother_server_yaml   = DeclareLaunchArgument( 'smoother_server_yaml',    default_value='smoother_server.yaml')
-    declare_behavior_server_yaml   = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
-    declare_waypoint_follower_yaml = DeclareLaunchArgument( 'waypoint_follower_yaml',  default_value='waypoint_follower.yaml')
-    declare_planner_server_yaml    = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
-    declare_velocity_smoother_yaml = DeclareLaunchArgument( 'velocity_smoother_yaml',  default_value='velocity_smoother.yaml')
+    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
+    argument_controller_server_yaml = LaunchConfiguration('controller_server_yaml')
+    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
+    argument_bt_navigator_yaml      = LaunchConfiguration('bt_navigator_yaml')
+    declare_smoother_server_yaml    = DeclareLaunchArgument( 'smoother_server_yaml',    default_value='smoother_server.yaml')
+    argument_smoother_server_yaml   = LaunchConfiguration('smoother_server_yaml')
+    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
+    argument_behavior_server_yaml   = LaunchConfiguration('behavior_server_yaml')
+    declare_waypoint_follower_yaml  = DeclareLaunchArgument( 'waypoint_follower_yaml',  default_value='waypoint_follower.yaml')
+    argument_waypoint_follower_yaml = LaunchConfiguration('waypoint_follower_yaml')
+    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
+    argument_planner_server_yaml    = LaunchConfiguration('planner_server_yaml')
+    declare_velocity_smoother_yaml  = DeclareLaunchArgument( 'velocity_smoother_yaml',  default_value='velocity_smoother.yaml')
+    argument_velocity_smoother_yaml = LaunchConfiguration('velocity_smoother_yaml')
     
     declare_use_robot = DeclareLaunchArgument(
         'use_robot',
@@ -145,6 +152,7 @@ def generate_launch_description():
     load_nodes = GroupAction(
         actions=[
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_controller_server_yaml, "' != 'empty'"]  )),
                 package='nav2_controller',
                 executable='controller_server',
                 output='screen',
@@ -154,6 +162,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_smoother_server_yaml, "' != 'empty'"]  )),
                 package='nav2_smoother',
                 executable='smoother_server',
                 name='smoother_server',
@@ -164,6 +173,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_planner_server_yaml, "' != 'empty'"]  )),
                 package='nav2_planner',
                 executable='planner_server',
                 name='planner_server',
@@ -174,6 +184,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_behavior_server_yaml, "' != 'empty'"]  )),
                 package='nav2_behaviors',
                 executable='behavior_server',
                 name='behavior_server',
@@ -184,6 +195,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_bt_navigator_yaml, "' != 'empty'"]  )),
                 package='nav2_bt_navigator',
                 executable='bt_navigator',
                 name='bt_navigator',
@@ -195,6 +207,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_waypoint_follower_yaml, "' != 'empty'"]  )),
                 package='nav2_waypoint_follower',
                 executable='waypoint_follower',
                 name='waypoint_follower',
@@ -205,6 +218,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(PythonExpression( ["'", argument_velocity_smoother_yaml, "' != 'empty'"]  )),
                 package='nav2_velocity_smoother',
                 executable='velocity_smoother',
                 name='velocity_smoother',
