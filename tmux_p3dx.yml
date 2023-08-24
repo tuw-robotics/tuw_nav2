@@ -24,7 +24,7 @@ windows:
           - ros2 launch tuw_nav2 rviz_launch.py
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py 
+          - ros2 launch tuw_nav2 localization_launch.py init_pose_yaml:=init_pose_cave.yaml
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch.py

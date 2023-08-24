@@ -37,20 +37,15 @@ def generate_launch_description():
     log_level = LaunchConfiguration('log_level')
 
     behavior_server_yaml          = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'behavior_server.yaml'),
+    bt_navigator_yaml          = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'bt_navigator.yaml'),
     #controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_dwb.yaml'),
     controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_mppi.yaml'),
-    #controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_purepursuite.yaml'),
+    controller_server_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'controller_server_purepursuite.yaml'),
     smoother_server_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'smoother_server.yaml'),
     waypoint_follower_yaml        = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'waypoint_follower.yaml'),
     planner_server_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'planner_server.yaml'),
     velocity_smoother_yaml       = os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'velocity_smoother.yaml'),
      
-    declare_params_file_cmd = DeclareLaunchArgument(
-        'params_file',
-        default_value=os.path.join(this_pgk_dir, 'config', 'nav2', 'pioneer3dx', 'v1', 'nav2.yaml'),
-        description='Full path to the ROS2 parameters file to use for all launched nodes')
-
-
 
     lifecycle_nodes = ['controller_server',
                        'smoother_server',
@@ -74,11 +69,17 @@ def generate_launch_description():
         'use_sim_time': use_sim_time,
         'autostart': autostart}
 
-    configured_params = RewrittenYaml(
-            source_file=params_file,
+    bt_navigator_yaml_rewritten = RewrittenYaml(
+            source_file=bt_navigator_yaml,
             root_key=namespace,
             param_rewrites=param_substitutions,
             convert_types=True)
+
+
+    declare_robot_used = DeclareLaunchArgument(
+        'robot_used',
+        default_value='pioneer3dx',
+        description='Robot used and configuration folder used: ./amcl/$robot_used/$parameters_used/..')
 
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
@@ -144,7 +145,7 @@ def generate_launch_description():
                 name='bt_navigator',
                 output='screen',
                 respawn_delay=2.0,
-                parameters=[configured_params],
+                parameters=[bt_navigator_yaml_rewritten],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -185,11 +186,12 @@ def generate_launch_description():
     ld.add_action(stdout_linebuf_envvar)
 
     # Declare the launch options
+    ld.add_action(declare_robot_used)
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_use_sim_time_cmd)
-    ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
+    
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
 
