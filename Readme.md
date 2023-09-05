@@ -52,4 +52,11 @@ ros2 launch tuw_nav2 nav2_minimal_launch.py  controller_server_yaml:=empty
 Starting the controller server only
 ```
 ros2 run nav2_controller controller_server --ros-args --params-file $WS/src/tuw_nav2/config/nav2/pioneer3dx/v1/controller_server_purepursuite.yaml
+ros2 run nav2_controller controller_server --ros-args --params-file $WS/src/tuw_nav2/config/nav2/pioneer3dx/v1/controller_server_mppi.yaml
+```
+
+## tmuxinator
+
+```
+tmuxinator start -p $WS/src/tuw_nav2/tmux_p3dx.yml
 ```

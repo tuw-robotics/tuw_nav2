@@ -4,7 +4,7 @@
 
 
 name: p3dx
-root: /opt/greenhive
+#root: /home/markus/projects/tuw-ros
 
 windows:
   - simulation:
