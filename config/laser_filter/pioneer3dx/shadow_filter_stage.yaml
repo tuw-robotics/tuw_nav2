@@ -1,0 +1,21 @@
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      name: box
+      type: laser_filters/LaserScanBoxFilter
+      params:
+        box_frame: laser
+        min_x: -0.15
+        max_x: 0.0
+        min_y: -0.15
+        max_y: 0.15
+        min_z: -1.0
+        max_z: 1.0
+    filter2:
+      name: shadows
+      type: laser_filters/ScanShadowsFilter
+      params:
+        min_angle: 10.
+        max_angle: 170.
+        neighbors: 3
+        window: 10
