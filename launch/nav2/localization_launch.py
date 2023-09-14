@@ -34,6 +34,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
+    namespace = LaunchConfiguration('namespace')
 
     lifecycle_nodes = ['map_server', 'amcl']
 
@@ -65,11 +66,16 @@ def generate_launch_description():
         default_value='cave',
         description='Map file used: /maps/$use_environment/map.yaml')
 
+    declare_namespace_cmd = DeclareLaunchArgument(
+        'namespace',
+        default_value='',
+        description='Used namespace')
+
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
-
+    
     declare_autostart_cmd = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the localization stack')
@@ -110,6 +116,7 @@ def generate_launch_description():
                 package='nav2_map_server',
                 executable='map_server',
                 name='map_server',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[{'use_sim_time': use_sim_time},
@@ -120,6 +127,7 @@ def generate_launch_description():
                 package='nav2_amcl',
                 executable='amcl',
                 name='amcl',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('amcl_param_file_path'),
@@ -131,6 +139,7 @@ def generate_launch_description():
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_localization',
+                namespace=namespace,
                 output='screen',
                 arguments=['--ros-args', '--log-level', log_level],
                 parameters=[{'use_sim_time': use_sim_time},
@@ -147,6 +156,7 @@ def generate_launch_description():
     ld.add_action(declare_init_pose_yaml)
     ld.add_action(declare_map_yaml)
     ld.add_action(declare_use_sim_time_cmd)
+    ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
     ld.add_action(declare_use_robot)

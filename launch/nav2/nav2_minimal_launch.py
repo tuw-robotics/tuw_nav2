@@ -34,6 +34,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
+    namespace = LaunchConfiguration('namespace')
      
 
     declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
@@ -63,6 +64,11 @@ def generate_launch_description():
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
 
+    declare_namespace_cmd = DeclareLaunchArgument(
+        'namespace',
+        default_value='',
+        description='Used namespace')
+    
     declare_autostart_cmd = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the nav2 stack')
@@ -122,6 +128,7 @@ def generate_launch_description():
                 condition=IfCondition(PythonExpression( ["'", argument_controller_server_yaml, "' != 'empty'"]  )),
                 package='nav2_controller',
                 executable='controller_server',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('controller_server_param_file_path'),
@@ -133,6 +140,7 @@ def generate_launch_description():
                 package='nav2_planner',
                 executable='planner_server',
                 name='planner_server',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('planner_server_param_file_path'),
@@ -144,6 +152,7 @@ def generate_launch_description():
                 package='nav2_behaviors',
                 executable='behavior_server',
                 name='behavior_server',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('behavior_server_param_file_path'),
@@ -155,6 +164,7 @@ def generate_launch_description():
                 package='nav2_bt_navigator',
                 executable='bt_navigator',
                 name='bt_navigator',
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('bt_navigator_yaml_param_file_path'),
@@ -166,6 +176,7 @@ def generate_launch_description():
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_navigation',
+                namespace=namespace,
                 output='screen',
                 arguments=['--ros-args', '--log-level', log_level],
                 parameters=[{'use_sim_time': use_sim_time},
@@ -184,6 +195,7 @@ def generate_launch_description():
     ld.add_action(declare_use_robot)
     ld.add_action(declare_use_version)
     ld.add_action(declare_use_sim_time_cmd)
+    ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_controller_server_yaml)
     ld.add_action(declare_bt_navigator_yaml)
     ld.add_action(declare_behavior_server_yaml)

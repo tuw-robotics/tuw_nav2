@@ -32,32 +32,3 @@ windows:
           #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_purepursuite.yaml
           #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml
           
-
-name: pioneer3dx_stage
-#root: /home/markus/projects/tuw-ros
-
-windows:
-  - simulation:
-      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
-      panes: 
-        - gazebo: 
-          - printf '\033]2;%s\033\\' 'gazebo'
-          - ros2 launch stage_ros2 stage.launch.py
-        - robot description: 
-          - printf '\033]2;%s\033\\' 'robot description'
-          - sleep 5; ros2 launch tuw_gazebo_models robot_description.launch.py model_name:=robot0  robot:=pioneer3dx
-        - laser filter: 
-          - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py filter_yaml:=shadow_filter_stage.yaml scan_src:=base_scan
-        - rviz: 
-          - printf '\033]2;%s\033\\' 'rviz'
-          - ros2 launch tuw_nav2 rviz_launch.py
-        - localization: 
-          - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
-        - navigation: 
-          - printf '\033]2;%s\033\\' 'navigation'
-          - read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py
-          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=nav2_params.yaml  bt_navigator_yaml:=nav2_params.yaml smoother_server_yaml:=nav2_params.yaml behavior_server_yaml:=nav2_params.yaml waypoint_follower_yaml:=nav2_params.yaml planner_server_yaml:=nav2_params.yaml velocity_smoother_yaml:=nav2_params.yaml
-          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_purepursuite.yaml
-          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml

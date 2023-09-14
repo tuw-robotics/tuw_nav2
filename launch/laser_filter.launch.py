@@ -42,6 +42,12 @@ def generate_launch_description():
         default_value='shadow_filter.yaml',
         description='filter configuration')
 
+    namespace = LaunchConfiguration('namespace')
+    declare_namespace_cmd = DeclareLaunchArgument(
+        'namespace',
+        default_value='',
+        description='Used namespace')
+    
     def create_full_path_configurations(context):
         filter_file_path = os.path.join(
             this_pgk_dir,
@@ -59,10 +65,12 @@ def generate_launch_description():
         declare_filter_yaml_cmd,
         declare_scan_src_cmd, 
         declare_scan_des_cmd, 
+        declare_namespace_cmd, 
         create_full_path_configurations_arg,
         Node(
             package="laser_filters",
             executable="scan_to_scan_filter_chain",
+            namespace=namespace,
             parameters=[LaunchConfiguration('filter_file_path')],
             remappings=[
                 ("scan", scan_src),
