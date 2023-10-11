@@ -34,7 +34,14 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
+
+    # Declare the launch arguments
     namespace = LaunchConfiguration('namespace')
+    declare_namespace_cmd = DeclareLaunchArgument(
+        'namespace',
+        default_value='robot_0',
+        description=('Top-level namespace. The value will be used to replace the '
+                     '<robot_namespace> keyword on the rviz config file.'))
 
     lifecycle_nodes = ['map_server', 'amcl']
 
