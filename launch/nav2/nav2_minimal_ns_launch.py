@@ -23,8 +23,8 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
-from nav2_common.launch import RewrittenYaml
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
+from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -76,7 +76,8 @@ def generate_launch_description():
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
-
+    
+    controller_server_param_file_path = LaunchConfiguration('controller_server_param_file_path')
     def create_full_path_configurations(context):
         controller_server_param_file_path = os.path.join(
             this_pgk_dir,
@@ -112,7 +113,6 @@ def generate_launch_description():
                 SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_file_path)]
 
     create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
-
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',

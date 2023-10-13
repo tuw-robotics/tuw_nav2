@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /TF1/Frames1
         - /TF1/Tree1
+        - /Map1
+        - /Map1/Topic1
       Splitter Ratio: 0.5833333134651184
     Tree Height: 400
   - Class: rviz_common/Selection
@@ -75,6 +77,12 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base_link:
+          Value: true
+        laser:
+          Value: true
+        odom:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -99,9 +107,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 0
+      Max Intensity: 1
       Min Color: 0; 0; 0
-      Min Intensity: 0
+      Min Intensity: 1
       Name: LaserScan
       Position Transformer: XYZ
       Selectable: true
@@ -164,13 +172,13 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: map
+        Value: /robot_0/map
       Update Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: map_updates
+        Value: /robot_0/map_updates
       Use Timestamp: false
       Value: true
     - Alpha: 1
@@ -503,5 +511,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1545
-  X: 365
-  Y: 114
+  X: 203
+  Y: 90

@@ -28,7 +28,16 @@ def generate_launch_description():
 
     lifecycle_nodes = ['map_server']
 
-    use_sim_time_arg = DeclareLaunchArgument(
+    # Declare the launch arguments
+    namespace = LaunchConfiguration('namespace')
+    declare_namespace_cmd = DeclareLaunchArgument(
+        'namespace',
+        default_value='robot_0',
+        description=('Top-level namespace. The value will be used to replace the '
+                     '<robot_namespace> keyword on the rviz config file.'))
+
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo/Stage) clock if true')
@@ -57,7 +66,8 @@ def generate_launch_description():
     create_map_yaml_filename_arg = OpaqueFunction(function=create_full_path_configurations)
 
     return LaunchDescription([
-        use_sim_time_arg,
+        declare_use_sim_time_cmd,
+        declare_namespace_cmd,
         map_yaml_filename_arg,
         autostart_arg,
         log_level_arg,
@@ -65,11 +75,13 @@ def generate_launch_description():
         Node(
             package='nav2_map_server',
             executable='map_server',
+            namespace=namespace,
             output='screen',
             parameters=[{'yaml_filename': map_yaml_filename}]),
         Node(
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',
+            namespace=namespace,
             name='lifecycle_manager_map',
             output='screen',
             arguments=['--ros-args', '--log-level', log_level],
