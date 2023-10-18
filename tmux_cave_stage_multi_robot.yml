@@ -1,0 +1,50 @@
+##enable named panes in tmux.conf with:
+#set -g pane-border-format "#{pane_index} #{pane_title}"
+#set -g pane-border-status bottom
+
+name: pioneer3dx
+#root: /home/markus/projects/tuw-ros
+
+windows:
+  - simulation:
+      layout: even-vertical
+      panes: 
+        - stage: 
+          - printf '\033]2;%s\033\\' 'stage'
+          - ros2 launch stage_ros2 stage.launch.py world:=cave_three_robots enforce_prefixes:=true one_tf_tree:=false
+  - robot_0:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py filter_yaml:=shadow_filter_stage.yaml namespace:=robot_0 scan_src:=base_scan scan_des:=scan use_sim_time:=true
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_ns_launch.py namespace:=robot_0 config:=nav2_ns
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave namespace:=robot_0
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_0
+  - robot_1:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py filter_yaml:=shadow_filter_stage.yaml namespace:=robot_1 scan_src:=base_scan scan_des:=scan use_sim_time:=true
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_ns_launch.py namespace:=robot_1 config:=nav2_ns
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave namespace:=robot_1 
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_1 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_1
