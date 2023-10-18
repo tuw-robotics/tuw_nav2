@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rviz2 REQUIRED)
 find_package(navigation2 REQUIRED)
 find_package(nav2_common REQUIRED)
+find_package(tuw_common REQUIRED)
 find_package(slam_toolbox REQUIRED)
 
 

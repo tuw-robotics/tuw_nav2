@@ -17,13 +17,13 @@ windows:
           - ros2 launch tuw_nav2 laser_filter.launch.py filter_yaml:=shadow_filter_stage.yaml namespace:=robot_0 scan_src:=base_scan scan_des:=scan use_sim_time:=true
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
-          - ros2 launch tuw_nav2 rviz_ns_launch.py
+          - ros2 launch tuw_nav2 rviz_ns_launch.py namespace:=robot_0 config:=nav2_ns
         - map: 
           - printf '\033]2;%s\033\\' 'map'
           - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - read -p "start nav2"; ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_0

@@ -24,7 +24,8 @@ from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
-from nav2_common.launch import RewrittenYaml
+from launch.launch_context import LaunchContext
+from tuw_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -37,13 +38,13 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
      
 
-    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
+    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite_ns.yaml')
     argument_controller_server_yaml = LaunchConfiguration('controller_server_yaml')
-    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
+    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator_ns.yaml')
     argument_bt_navigator_yaml      = LaunchConfiguration('bt_navigator_yaml')
-    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
+    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server_ns.yaml')
     argument_behavior_server_yaml   = LaunchConfiguration('behavior_server_yaml')
-    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
+    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server_ns.yaml')    
     argument_planner_server_yaml    = LaunchConfiguration('planner_server_yaml')
     
     declare_use_robot = DeclareLaunchArgument(
@@ -77,40 +78,42 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
     
-    controller_server_param_file_path = LaunchConfiguration('controller_server_param_file_path')
-    def create_full_path_configurations(context):
-        controller_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['controller_server_yaml'])
-        print(controller_server_param_file_path)
-        bt_navigator_yaml_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['bt_navigator_yaml'])
-        print(bt_navigator_yaml_param_file_path)
-        behavior_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['behavior_server_yaml'])
-        print(behavior_server_param_file_path)
-        planner_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['planner_server_yaml'])
-        print(planner_server_param_file_path)
-        return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_file_path),
-                SetLaunchConfiguration('bt_navigator_yaml_param_file_path', bt_navigator_yaml_param_file_path),
-                SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_file_path),
-                SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_file_path)]
+
+
+
+    def create_full_path_configurations(context: LaunchContext):
+        
+        def create_rewritten_yaml(context: LaunchContext, source_file_name):
+            param_substitutions = {
+                'use_sim_time': use_sim_time,
+                'autostart': autostart}
+            source_file_path = os.path.join(
+                this_pgk_dir,
+                'config', 'nav2',
+                context.launch_configurations['use_robot'],
+                context.launch_configurations['use_version'],
+                source_file_name)
+            print(source_file_path)
+            source_file_rewritten = RewrittenYaml(
+                    source_file=source_file_path,
+                    root_key=namespace,
+                    param_rewrites=param_substitutions,
+                    convert_types=True,
+                    prefix= context.launch_configurations['namespace'])
+            print(source_file_rewritten)
+            # destination_file_rewritten = os.path.join('tmp', source_file_name)
+            # os.rename(source_file_rewritten, destination_file_rewritten)
+            return source_file_rewritten;
+    
+        controller_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['controller_server_yaml'])
+        bt_navigator_yaml_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['bt_navigator_yaml'])
+        behavior_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['behavior_server_yaml'])
+        planner_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['planner_server_yaml'])
+    
+        return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_rewritten),
+                SetLaunchConfiguration('bt_navigator_yaml_param_file_path', bt_navigator_yaml_param_rewritten),
+                SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_rewritten),
+                SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_rewritten)]
 
     create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
 
