@@ -42,11 +42,11 @@ def generate_launch_description():
 
     declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
     argument_controller_server_yaml = LaunchConfiguration('controller_server_yaml')
-    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator_ns.yaml')
+    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
     argument_bt_navigator_yaml      = LaunchConfiguration('bt_navigator_yaml')
-    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server_ns.yaml')
+    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
     argument_behavior_server_yaml   = LaunchConfiguration('behavior_server_yaml')
-    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server_ns.yaml')    
+    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
     argument_planner_server_yaml    = LaunchConfiguration('planner_server_yaml')
     
     declare_use_robot = DeclareLaunchArgument(
