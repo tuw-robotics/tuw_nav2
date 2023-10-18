@@ -25,7 +25,9 @@ from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
 from launch.launch_context import LaunchContext
-from tuw_common.launch import RewrittenYaml
+from launch_ros.descriptions import ParameterFile
+from nav2_common.launch import RewrittenYaml
+from nav2_common.launch import ReplaceString
 
 
 def generate_launch_description():
@@ -38,7 +40,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
      
 
-    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite_ns.yaml')
+    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
     argument_controller_server_yaml = LaunchConfiguration('controller_server_yaml')
     declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator_ns.yaml')
     argument_bt_navigator_yaml      = LaunchConfiguration('bt_navigator_yaml')
@@ -84,6 +86,7 @@ def generate_launch_description():
     def create_full_path_configurations(context: LaunchContext):
         
         def create_rewritten_yaml(context: LaunchContext, source_file_name):
+            #'topic': '/' + context.launch_configurations['namespace'] + '/scan',
             param_substitutions = {
                 'use_sim_time': use_sim_time,
                 'autostart': autostart}
@@ -93,14 +96,16 @@ def generate_launch_description():
                 context.launch_configurations['use_robot'],
                 context.launch_configurations['use_version'],
                 source_file_name)
+            print('#')
             print(source_file_path)
-            source_file_rewritten = RewrittenYaml(
+            tmp_file = ReplaceString(
                     source_file=source_file_path,
+                    replacements={'/scan': ('/', namespace, '/scan')})
+            source_file_rewritten = RewrittenYaml(
+                    source_file=tmp_file,
                     root_key=namespace,
                     param_rewrites=param_substitutions,
-                    convert_types=True,
-                    prefix= context.launch_configurations['namespace'])
-            print(source_file_rewritten)
+                    convert_types=True)
             # destination_file_rewritten = os.path.join('tmp', source_file_name)
             # os.rename(source_file_rewritten, destination_file_rewritten)
             return source_file_rewritten;

@@ -69,6 +69,7 @@ controller_server:
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
 
+
 local_costmap:
   local_costmap:
     ros__parameters:
@@ -98,7 +99,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: scan
         scan:
-          topic: /scan
+          topic: ../scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
