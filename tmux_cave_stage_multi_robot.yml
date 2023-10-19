@@ -26,7 +26,7 @@ windows:
           - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave namespace:=robot_0
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave_robot_0.yaml use_environment:=cave use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_0
@@ -44,7 +44,7 @@ windows:
           - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave namespace:=robot_1 
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_1 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_1 init_pose_yaml:=init_pose_cave_robot_1.yaml use_environment:=cave use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_1
