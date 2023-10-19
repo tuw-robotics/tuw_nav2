@@ -1,0 +1,68 @@
+##enable named panes in tmux.conf with:
+#set -g pane-border-format "#{pane_index} #{pane_title}"
+#set -g pane-border-status bottom
+
+name: pioneer3dx
+#root: /home/markus/projects/tuw-ros
+
+windows:
+  - simulation:
+      layout: even-vertical
+      panes: 
+        - stage: 
+          - printf '\033]2;%s\033\\' 'stage'
+          - ros2 launch stage_ros2 stage.launch.py world:=hallway enforce_prefixes:=true one_tf_tree:=false
+  - robot_0:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml namespace:=robot_0 scan_src:=base_scan scan_des:=scan
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_0 config:=nav2_minimal
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_launch.py use_sim_time:=true namespace:=robot_0 environment:=hallway
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_hallway_robot_0.yaml vehilce:=pioneer3dx
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - ros2 launch tuw_nav2 nav2_minimal_launch.py use_sim_time:=true namespace:=robot_0
+  - robot_1:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true namespace:=robot_1 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_1 config:=nav2_minimal
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_launch.py use_sim_time:=true namespace:=robot_1 environment:=hallway 
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true namespace:=robot_1 init_pose_yaml:=init_pose_hallway_robot_1.yaml vehilce:=pioneer3dx
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - ros2 launch tuw_nav2 nav2_minimal_launch.py use_sim_time:=true namespace:=robot_1
+  - robot_2:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - laser filter: 
+          - printf '\033]2;%s\033\\' 'laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true namespace:=robot_2 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
+        - rviz: 
+          - printf '\033]2;%s\033\\' 'rviz'
+          - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_2 config:=nav2_minimal
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_launch.py use_sim_time:=true namespace:=robot_2 environment:=hallway 
+        - localization: 
+          - printf '\033]2;%s\033\\' 'localization'
+          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true namespace:=robot_2 init_pose_yaml:=init_pose_hallway_robot_2.yaml vehilce:=pioneer3dx
+        - navigation: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - ros2 launch tuw_nav2 nav2_minimal_launch.py use_sim_time:=true namespace:=robot_2
