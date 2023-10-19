@@ -22,22 +22,21 @@ def generate_launch_description():
     this_pgk_dir = get_package_share_directory(this_pgk)
 
     use_sim_time = LaunchConfiguration('use_sim_time')
-    map_yaml_filename = LaunchConfiguration('map_yaml_filename')
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
 
     lifecycle_nodes = ['map_server']
 
-    use_sim_time_arg = DeclareLaunchArgument(
+    declare_use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo/Stage) clock if true')
     
-    map_yaml_filename_arg = DeclareLaunchArgument(
-        'map_yaml_filename',
+    declare_map_arg = DeclareLaunchArgument(
+        'map_folder',
         description='map folder name like cave, hallway')
     
-    autostart_arg = DeclareLaunchArgument(
+    declare_autostart_arg = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the nav2 stack')
     
@@ -49,24 +48,24 @@ def generate_launch_description():
         map_file_path = os.path.join(
             this_pgk_dir,
             'config','maps',
-            context.launch_configurations['map_yaml_filename'],
+            context.launch_configurations['map_folder'],
             'map.yaml')
         print(map_file_path)
-        return [SetLaunchConfiguration('map_yaml_filename', map_file_path)]
+        return [SetLaunchConfiguration('yaml_filename', map_file_path)]
 
     create_map_yaml_filename_arg = OpaqueFunction(function=create_full_path_configurations)
 
     return LaunchDescription([
-        use_sim_time_arg,
-        map_yaml_filename_arg,
-        autostart_arg,
+        declare_use_sim_time_arg,
+        declare_autostart_arg,
         log_level_arg,
+        declare_map_arg,
         create_map_yaml_filename_arg,
         Node(
             package='nav2_map_server',
             executable='map_server',
             output='screen',
-            parameters=[{'yaml_filename': map_yaml_filename}]),
+            parameters=[{'yaml_filename': LaunchConfiguration('yaml_filename')}]),
         Node(
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',

@@ -9,8 +9,8 @@ windows:
   - simulation:
       layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
       panes: 
-        - gazebo: 
-          - printf '\033]2;%s\033\\' 'gazebo'
+        - stage: 
+          - printf '\033]2;%s\033\\' 'stage'
           - ros2 launch stage_ros2 stage.launch.py world:=cave enforce_prefixes:=true one_tf_tree:=false
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
@@ -20,10 +20,13 @@ windows:
           - ros2 launch tuw_nav2 rviz_ns_launch.py namespace:=robot_0 config:=nav2_ns
         - map: 
           - printf '\033]2;%s\033\\' 'map'
-          - ros2 launch tuw_nav2 map_server_ns_launch.py map_yaml_filename:=cave
+          - ros2 launch tuw_nav2 map_server_ns_launch.py map_folder:=cave
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
           - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_0
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=nav2_params.yaml  bt_navigator_yaml:=nav2_params.yaml smoother_server_yaml:=nav2_params.yaml behavior_server_yaml:=nav2_params.yaml waypoint_follower_yaml:=nav2_params.yaml planner_server_yaml:=nav2_params.yaml velocity_smoother_yaml:=nav2_params.yaml
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_purepursuite.yaml
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml

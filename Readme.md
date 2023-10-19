@@ -61,3 +61,11 @@ ros2 run nav2_controller controller_server --ros-args --params-file $WS/src/tuw_
 tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_gazebo.yml
 tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_stage.yml 
 ```
+
+## tmuxinator
+
+```
+tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_gazebo.yml
+tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_stage.yml 
+tmuxinator start -p ws02/src/tuw_nav2/tmux_cave_stage_multi_robot.yml
+```

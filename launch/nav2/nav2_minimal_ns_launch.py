@@ -25,9 +25,11 @@ from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
 from launch.launch_context import LaunchContext
+from launch import utilities
 from launch_ros.descriptions import ParameterFile
-from nav2_common.launch import RewrittenYaml
+from tuw_common.launch import RewrittenYaml
 from nav2_common.launch import ReplaceString
+
 
 
 def generate_launch_description():
@@ -96,20 +98,21 @@ def generate_launch_description():
                 context.launch_configurations['use_robot'],
                 context.launch_configurations['use_version'],
                 source_file_name)
-            print('#')
-            print(source_file_path)
             tmp_file = ReplaceString(
                     source_file=source_file_path,
                     replacements={'/scan': ('/', namespace, '/scan')})
-            source_file_rewritten = RewrittenYaml(
+            tmp_file2 = RewrittenYaml(
                     source_file=tmp_file,
+                    oginal_file=source_file_path,
                     root_key=namespace,
                     param_rewrites=param_substitutions,
                     convert_types=True)
+            
             # destination_file_rewritten = os.path.join('tmp', source_file_name)
             # os.rename(source_file_rewritten, destination_file_rewritten)
-            return source_file_rewritten;
+            return tmp_file2;
     
+
         controller_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['controller_server_yaml'])
         bt_navigator_yaml_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['bt_navigator_yaml'])
         behavior_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['behavior_server_yaml'])
