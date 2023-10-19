@@ -27,20 +27,30 @@ def generate_launch_description():
 
     lifecycle_nodes = ['map_server']
 
+    # Declare the launch arguments
+    namespace = LaunchConfiguration('namespace')
+    declare_namespace_arg = DeclareLaunchArgument(
+        'namespace',
+        default_value='',
+        description=('Top-level namespace. The value will be used to replace the '
+                     '<robot_namespace> keyword on the rviz config file.'))
+
+    use_sim_time = LaunchConfiguration('use_sim_time')
     declare_use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo/Stage) clock if true')
     
-    declare_map_arg = DeclareLaunchArgument(
-        'map_folder',
-        description='map folder name like cave, hallway')
+    declare_environment_arg = DeclareLaunchArgument(
+        'environment',
+        description=('The enviroment defines the map folder used '
+                     '(cave, hallway, ...).'))
     
     declare_autostart_arg = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the nav2 stack')
     
-    log_level_arg = DeclareLaunchArgument(
+    declare_log_level_arg = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
     
@@ -48,7 +58,7 @@ def generate_launch_description():
         map_file_path = os.path.join(
             this_pgk_dir,
             'config','maps',
-            context.launch_configurations['map_folder'],
+            context.launch_configurations['environment'],
             'map.yaml')
         print(map_file_path)
         return [SetLaunchConfiguration('yaml_filename', map_file_path)]
@@ -57,18 +67,21 @@ def generate_launch_description():
 
     return LaunchDescription([
         declare_use_sim_time_arg,
+        declare_namespace_arg,
         declare_autostart_arg,
-        log_level_arg,
-        declare_map_arg,
+        declare_log_level_arg,
+        declare_environment_arg,
         create_map_yaml_filename_arg,
         Node(
             package='nav2_map_server',
             executable='map_server',
+            namespace=namespace,
             output='screen',
             parameters=[{'yaml_filename': LaunchConfiguration('yaml_filename')}]),
         Node(
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',
+            namespace=namespace,
             name='lifecycle_manager_map',
             output='screen',
             arguments=['--ros-args', '--log-level', log_level],

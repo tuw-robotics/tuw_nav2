@@ -20,10 +20,10 @@ windows:
           - ros2 launch tuw_nav2 rviz_ns_launch.py namespace:=robot_0 config:=nav2_ns
         - map: 
           - printf '\033]2;%s\033\\' 'map'
-          - ros2 launch tuw_nav2 map_server_ns_launch.py map_folder:=cave
+          - ros2 launch tuw_nav2 map_server_launch.py environment:=cave namespace:=robot_0
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_ns_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_cave.yaml use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_ns_launch.py use_sim_time:=true namespace:=robot_0

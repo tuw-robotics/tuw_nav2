@@ -36,7 +36,7 @@ def generate_launch_description():
     log_level = LaunchConfiguration('log_level')
     namespace = LaunchConfiguration('namespace')
 
-    lifecycle_nodes = ['map_server', 'amcl']
+    lifecycle_nodes = ['amcl']
 
     remappings = [('/tf', 'tf'),
                   ('/tf_static', 'tf_static')]
@@ -51,21 +51,11 @@ def generate_launch_description():
         default_value='init_pose.yaml',
         description='amcl init pose parameter file name')
     
-    declare_map_yaml = DeclareLaunchArgument(
-        'map_yaml',
-        default_value='map.yaml',
-        description='map yaml file name')
-    
     declare_use_robot = DeclareLaunchArgument(
         'use_robot',
         default_value='pioneer3dx',
         description='Robot used and configuration folder used: ./amcl/$use_robot/$parameters_used/..')
     
-    declare_use_environment = DeclareLaunchArgument(
-        'use_environment',
-        default_value='cave',
-        description='Map file used: /maps/$use_environment/map.yaml')
-
     declare_namespace_cmd = DeclareLaunchArgument(
         'namespace',
         default_value='',
@@ -98,31 +88,13 @@ def generate_launch_description():
             context.launch_configurations['use_robot'],
             context.launch_configurations['init_pose_yaml'])
         print(amcl_init_param_file_path)
-        particle_filter_map_file_path = os.path.join(
-            this_pgk_dir,
-            'config','maps',
-            context.launch_configurations['use_environment'],
-            context.launch_configurations['map_yaml'])
-        print(particle_filter_map_file_path)
         return [SetLaunchConfiguration('amcl_param_file_path', amcl_param_file_path),
-                SetLaunchConfiguration('amcl_init_param_file_path', amcl_init_param_file_path),
-                SetLaunchConfiguration('particle_filter_map_file_path', particle_filter_map_file_path)]
+                SetLaunchConfiguration('amcl_init_param_file_path', amcl_init_param_file_path)]
 
     create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
 
     load_nodes = GroupAction(
         actions=[
-            Node(
-                package='nav2_map_server',
-                executable='map_server',
-                name='map_server',
-                namespace=namespace,
-                output='screen',
-                respawn_delay=2.0,
-                parameters=[{'use_sim_time': use_sim_time},
-                            {'yaml_filename': LaunchConfiguration('particle_filter_map_file_path')}],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings),
             Node(
                 package='nav2_amcl',
                 executable='amcl',
@@ -154,13 +126,11 @@ def generate_launch_description():
     # Declare the launch options
     ld.add_action(declare_amcl_yaml)
     ld.add_action(declare_init_pose_yaml)
-    ld.add_action(declare_map_yaml)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_log_level_cmd)
     ld.add_action(declare_use_robot)
-    ld.add_action(declare_use_environment)
 
     #Opaque function call
     ld.add_action(create_full_path_configurations_arg)

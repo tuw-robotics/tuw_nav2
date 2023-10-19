@@ -21,9 +21,12 @@ windows:
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py
+        - map: 
+          - printf '\033]2;%s\033\\' 'map'
+          - ros2 launch tuw_nav2 map_server_launch.py environment:=cave
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml use_environment:=cave use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml use_robot:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py
