@@ -1,17 +1,3 @@
-# Copyright (c) 2018 Intel Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -31,46 +17,55 @@ def generate_launch_description():
     # Get the launch directory
     this_pgk_dir = get_package_share_directory('tuw_nav2')
   
-    use_sim_time = LaunchConfiguration('use_sim_time')
-    autostart = LaunchConfiguration('autostart')
-    log_level = LaunchConfiguration('log_level')
-    namespace = LaunchConfiguration('namespace')
+    use_sim_time_cfg = LaunchConfiguration('use_sim_time')
+    autostart_cfg = LaunchConfiguration('autostart')
+    log_level_cfg = LaunchConfiguration('log_level')
+
+    # Declare the launch arguments
+    namespace_cfg = LaunchConfiguration('namespace')
+    namespace_arg = DeclareLaunchArgument(
+        'namespace',
+        default_value='',
+        description=('Top-level namespace. The value will be used to replace the '
+                     '<robot_namespace> keyword on the rviz config file.'))
 
     lifecycle_nodes = ['amcl']
 
     remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+                  ('/tf_static', 'tf_static'),
+                  ('/initialpose', 'initialpose'),
+                  ('/scan', 'scan')]
 
-    declare_amcl_yaml = DeclareLaunchArgument(
+    amcl_yaml_arg = DeclareLaunchArgument(
         'amcl_yaml',
         default_value='amcl.yaml',
         description='amcl parameter file name')
 
-    declare_init_pose_yaml = DeclareLaunchArgument(
+    init_pose_yaml_arg = DeclareLaunchArgument(
         'init_pose_yaml',
         default_value='init_pose.yaml',
         description='amcl init pose parameter file name')
     
-    declare_use_robot = DeclareLaunchArgument(
-        'use_robot',
+    vehilce_arg = DeclareLaunchArgument(
+        'vehilce',
         default_value='pioneer3dx',
-        description='Robot used and configuration folder used: ./amcl/$use_robot/$parameters_used/..')
+        description='Robot used and configuration folder used: ./amcl/$vehilce/$parameters_used/..')
     
-    declare_namespace_cmd = DeclareLaunchArgument(
+    namespace_arg = DeclareLaunchArgument(
         'namespace',
         default_value='',
         description='Used namespace')
 
-    declare_use_sim_time_cmd = DeclareLaunchArgument(
+    use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
     
-    declare_autostart_cmd = DeclareLaunchArgument(
+    autostart_arg = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the localization stack')
 
-    declare_log_level_cmd = DeclareLaunchArgument(
+    log_level_arg = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
 
@@ -79,13 +74,13 @@ def generate_launch_description():
         amcl_param_file_path = os.path.join(
             this_pgk_dir,
             'config', 'amcl',
-            context.launch_configurations['use_robot'],
+            context.launch_configurations['vehilce'],
             context.launch_configurations['amcl_yaml'])
         print(amcl_param_file_path)
         amcl_init_param_file_path = os.path.join(
             this_pgk_dir,
             'config', 'amcl',
-            context.launch_configurations['use_robot'],
+            context.launch_configurations['vehilce'],
             context.launch_configurations['init_pose_yaml'])
         print(amcl_init_param_file_path)
         return [SetLaunchConfiguration('amcl_param_file_path', amcl_param_file_path),
@@ -99,23 +94,23 @@ def generate_launch_description():
                 package='nav2_amcl',
                 executable='amcl',
                 name='amcl',
-                namespace=namespace,
+                namespace=namespace_cfg,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('amcl_param_file_path'),
                             LaunchConfiguration('amcl_init_param_file_path'),
-                            {'use_sim_time': use_sim_time}],
-                arguments=['--ros-args', '--log-level', log_level],
+                            {'use_sim_time': use_sim_time_cfg}],
+                arguments=['--ros-args', '--log-level', log_level_cfg],
                 remappings=remappings),
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_localization',
-                namespace=namespace,
+                namespace=namespace_cfg,
                 output='screen',
-                arguments=['--ros-args', '--log-level', log_level],
-                parameters=[{'use_sim_time': use_sim_time},
-                            {'autostart': autostart},
+                arguments=['--ros-args', '--log-level', log_level_cfg],
+                parameters=[{'use_sim_time': use_sim_time_cfg},
+                            {'autostart': autostart_cfg},
                             {'node_names': lifecycle_nodes}])
         ]
     )
@@ -124,14 +119,13 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Declare the launch options
-    ld.add_action(declare_amcl_yaml)
-    ld.add_action(declare_init_pose_yaml)
-    ld.add_action(declare_use_sim_time_cmd)
-    ld.add_action(declare_namespace_cmd)
-    ld.add_action(declare_autostart_cmd)
-    ld.add_action(declare_log_level_cmd)
-    ld.add_action(declare_use_robot)
-
+    ld.add_action(amcl_yaml_arg)
+    ld.add_action(init_pose_yaml_arg)
+    ld.add_action(use_sim_time_arg)
+    ld.add_action(namespace_arg)
+    ld.add_action(autostart_arg)
+    ld.add_action(log_level_arg)
+    ld.add_action(vehilce_arg)
     #Opaque function call
     ld.add_action(create_full_path_configurations_arg)
     

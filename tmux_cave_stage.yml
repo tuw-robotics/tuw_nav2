@@ -17,19 +17,20 @@ windows:
           - ros2 launch tuw_gazebo_models robot_description.launch.py model_name:=robot0  robot:=pioneer3dx
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py filter_yaml:=shadow_filter_stage.yaml scan_src:=base_scan
+          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml scan_src:=base_scan
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
-          - ros2 launch tuw_nav2 rviz_launch.py
+          - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true config:=nav2
         - map: 
           - printf '\033]2;%s\033\\' 'map'
-          - ros2 launch tuw_nav2 map_server_launch.py environment:=cave
+          - ros2 launch tuw_nav2 map_server_launch.py use_sim_time:=true environment:=cave
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml use_robot:=pioneer3dx
+          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true init_pose_yaml:=init_pose_cave.yaml vehilce:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
-          - read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py
+          - ros2 launch tuw_nav2 nav2_minimal_launch.py use_sim_time:=true
+          # - ros2 launch tuw_nav2 nav2_default_launch.py
           #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=nav2_params.yaml  bt_navigator_yaml:=nav2_params.yaml smoother_server_yaml:=nav2_params.yaml behavior_server_yaml:=nav2_params.yaml waypoint_follower_yaml:=nav2_params.yaml planner_server_yaml:=nav2_params.yaml velocity_smoother_yaml:=nav2_params.yaml
           #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_purepursuite.yaml
           #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml

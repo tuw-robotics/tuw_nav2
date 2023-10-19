@@ -23,8 +23,13 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
-from nav2_common.launch import RewrittenYaml
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
+from launch.launch_context import LaunchContext
+from launch import utilities
+from launch_ros.descriptions import ParameterFile
+from tuw_common.launch import RewrittenYaml
+from nav2_common.launch import ReplaceString
+
 
 
 def generate_launch_description():
@@ -37,82 +42,84 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
      
 
-    declare_controller_server_yaml  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
-    argument_controller_server_yaml = LaunchConfiguration('controller_server_yaml')
-    declare_bt_navigator_yaml       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
-    argument_bt_navigator_yaml      = LaunchConfiguration('bt_navigator_yaml')
-    declare_behavior_server_yaml    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
-    argument_behavior_server_yaml   = LaunchConfiguration('behavior_server_yaml')
-    declare_planner_server_yaml     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
-    argument_planner_server_yaml    = LaunchConfiguration('planner_server_yaml')
+    controller_server_yaml_arg  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
+    controller_server_yaml_cfg  = LaunchConfiguration('controller_server_yaml')
+    bt_navigator_yaml_arg       = DeclareLaunchArgument( 'bt_navigator_yaml',       default_value='bt_navigator.yaml')
+    bt_navigator_yaml_cfg       = LaunchConfiguration('bt_navigator_yaml')
+    behavior_server_yaml_arg    = DeclareLaunchArgument( 'behavior_server_yaml',    default_value='behavior_server.yaml')
+    behavior_server_yaml_cfg    = LaunchConfiguration('behavior_server_yaml')
+    planner_server_yaml_arg     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
+    planner_server_yaml_cfg     = LaunchConfiguration('planner_server_yaml')
     
-    declare_use_robot = DeclareLaunchArgument(
-        'use_robot',
+    vehilce_arg = DeclareLaunchArgument(
+        'vehilce',
         default_value='pioneer3dx',
-        description='Robot used and configuration folder used: ./nav2/$use_robot/$use_version/..')
+        description='Vehilce used and configuration folder used: ./nav2/$vehilce/$version/..')
 
-    declare_use_version = DeclareLaunchArgument(
-        'use_version',
+    version_arg = DeclareLaunchArgument(
+        'version',
         default_value='v1',
-        description='Robot used and configuration folder used: ./nav2/$use_robot/$use_version/..')
+        description='Vehilce used and configuration folder used: ./nav2/$vehilce/$version/..')
 
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
 
-    declare_use_sim_time_cmd = DeclareLaunchArgument(
+    use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
 
-    declare_namespace_cmd = DeclareLaunchArgument(
+    namespace_arg = DeclareLaunchArgument(
         'namespace',
         default_value='',
         description='Used namespace')
     
-    declare_autostart_cmd = DeclareLaunchArgument(
+    autostart_arg = DeclareLaunchArgument(
         'autostart', default_value='true',
         description='Automatically startup the nav2 stack')
 
-    declare_log_level_cmd = DeclareLaunchArgument(
+    log_level_arg = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
+    
+    def create_full_path_configurations(context: LaunchContext):
+        
+        def create_rewritten_yaml(context: LaunchContext, source_file_name):
+            #'topic': '/' + context.launch_configurations['namespace'] + '/scan',
+            param_substitutions = {
+                'use_sim_time': use_sim_time,
+                'autostart': autostart}
+            configuration_yaml = os.path.join(
+                this_pgk_dir,
+                'config', 'nav2',
+                context.launch_configurations['vehilce'],
+                context.launch_configurations['version'],
+                source_file_name)
+            if context.launch_configurations['namespace']:
+                tmp_file = ReplaceString(
+                        source_file=configuration_yaml,
+                        replacements={'/scan': ('/', namespace, '/scan')})
+                configuration_yaml = RewrittenYaml(
+                        source_file=tmp_file,
+                        oginal_file=configuration_yaml,
+                        root_key=namespace,
+                        param_rewrites=param_substitutions,
+                        convert_types=True)
+            
+            return configuration_yaml;
+    
 
-    def create_full_path_configurations(context):
-        controller_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['controller_server_yaml'])
-        print(controller_server_param_file_path)
-        bt_navigator_yaml_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['bt_navigator_yaml'])
-        print(bt_navigator_yaml_param_file_path)
-        behavior_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['behavior_server_yaml'])
-        print(behavior_server_param_file_path)
-        planner_server_param_file_path = os.path.join(
-            this_pgk_dir,
-            'config', 'nav2',
-            context.launch_configurations['use_robot'],
-            context.launch_configurations['use_version'],
-            context.launch_configurations['planner_server_yaml'])
-        print(planner_server_param_file_path)
-        return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_file_path),
-                SetLaunchConfiguration('bt_navigator_yaml_param_file_path', bt_navigator_yaml_param_file_path),
-                SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_file_path),
-                SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_file_path)]
+        controller_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['controller_server_yaml'])
+        bt_navigator_yaml_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['bt_navigator_yaml'])
+        behavior_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['behavior_server_yaml'])
+        planner_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['planner_server_yaml'])
+    
+        return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_rewritten),
+                SetLaunchConfiguration('bt_navigator_yaml_param_file_path', bt_navigator_yaml_param_rewritten),
+                SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_rewritten),
+                SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_rewritten)]
 
     create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
-
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',
@@ -125,7 +132,7 @@ def generate_launch_description():
     load_nodes = GroupAction(
         actions=[
             Node(
-                condition=IfCondition(PythonExpression( ["'", argument_controller_server_yaml, "' != 'empty'"]  )),
+                condition=IfCondition(PythonExpression( ["'", controller_server_yaml_cfg, "' != 'empty'"]  )),
                 package='nav2_controller',
                 executable='controller_server',
                 namespace=namespace,
@@ -136,7 +143,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
-                condition=IfCondition(PythonExpression( ["'", argument_planner_server_yaml, "' != 'empty'"]  )),
+                condition=IfCondition(PythonExpression( ["'", planner_server_yaml_cfg, "' != 'empty'"]  )),
                 package='nav2_planner',
                 executable='planner_server',
                 name='planner_server',
@@ -148,7 +155,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
-                condition=IfCondition(PythonExpression( ["'", argument_behavior_server_yaml, "' != 'empty'"]  )),
+                condition=IfCondition(PythonExpression( ["'", behavior_server_yaml_cfg, "' != 'empty'"]  )),
                 package='nav2_behaviors',
                 executable='behavior_server',
                 name='behavior_server',
@@ -160,7 +167,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
-                condition=IfCondition(PythonExpression( ["'", argument_bt_navigator_yaml, "' != 'empty'"]  )),
+                condition=IfCondition(PythonExpression( ["'", bt_navigator_yaml_cfg, "' != 'empty'"]  )),
                 package='nav2_bt_navigator',
                 executable='bt_navigator',
                 name='bt_navigator',
@@ -192,17 +199,16 @@ def generate_launch_description():
     ld.add_action(stdout_linebuf_envvar)
 
     # Declare the launch options
-    ld.add_action(declare_use_robot)
-    ld.add_action(declare_use_version)
-    ld.add_action(declare_use_sim_time_cmd)
-    ld.add_action(declare_namespace_cmd)
-    ld.add_action(declare_controller_server_yaml)
-    ld.add_action(declare_bt_navigator_yaml)
-    ld.add_action(declare_behavior_server_yaml)
-    ld.add_action(declare_planner_server_yaml)
-    ld.add_action(declare_autostart_cmd)
-    ld.add_action(declare_log_level_cmd)
-    ld.add_action(declare_log_level_cmd)
+    ld.add_action(vehilce_arg)
+    ld.add_action(version_arg)
+    ld.add_action(use_sim_time_arg)
+    ld.add_action(namespace_arg)
+    ld.add_action(controller_server_yaml_arg)
+    ld.add_action(bt_navigator_yaml_arg)
+    ld.add_action(behavior_server_yaml_arg)
+    ld.add_action(planner_server_yaml_arg)
+    ld.add_action(autostart_arg)
+    ld.add_action(log_level_arg)
     
     #Opaque function call
     ld.add_action(create_full_path_configurations_arg)
