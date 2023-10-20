@@ -55,17 +55,13 @@ ros2 run nav2_controller controller_server --ros-args --params-file $WS/src/tuw_
 ros2 run nav2_controller controller_server --ros-args --params-file $WS/src/tuw_nav2/config/nav2/pioneer3dx/v1/controller_server_mppi.yaml
 ```
 
-## tmuxinator
-
-```
-tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_gazebo.yml
-tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_stage.yml 
-```
 
 ## tmuxinator
 
 ```
-tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_gazebo.yml
-tmuxinator start -p $WS/src/tuw_nav2/tmux_cave_stage.yml 
-tmuxinator start -p ws02/src/tuw_nav2/tmux_cave_stage_multi_robot.yml
+cd $WS
+tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_gazebo.yml
+tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_ns.yml
+tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_ns.yml 
+tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_three_robots.yml
 ```
