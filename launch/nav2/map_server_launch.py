@@ -2,40 +2,33 @@
 import os
 
 from launch import LaunchDescription
-from launch.substitutions import PathJoinSubstitution
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
-from launch_ros.actions import Node
-import launch_ros.actions
-
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration, TextSubstitution
+from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
 from launch_ros.actions import Node
-
 
 def generate_launch_description():
     this_pgk = 'tuw_nav2'
     this_pgk_dir = get_package_share_directory(this_pgk)
 
-    use_sim_time_cfg = LaunchConfiguration('use_sim_time')
-    autostart_cfg = LaunchConfiguration('autostart')
-    log_level_cfg = LaunchConfiguration('log_level')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    autostart = LaunchConfiguration('autostart')
+    log_level = LaunchConfiguration('log_level')
+    launch_lifecycle_manager = LaunchConfiguration('launch_lifecycle_manager')
 
     lifecycle_nodes = ['map_server']
 
     # Declare the launch arguments
-    namespace_cfg = LaunchConfiguration('namespace')
+    namespace = LaunchConfiguration('namespace')
     namespace_arg = DeclareLaunchArgument(
         'namespace',
         default_value='',
         description=('Top-level namespace. The value will be used to replace the '
                      '<robot_namespace> keyword on the rviz config file.'))
 
-    use_sim_time_cfg = LaunchConfiguration('use_sim_time')
+    use_sim_time = LaunchConfiguration('use_sim_time')
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='true',
@@ -54,6 +47,11 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
     
+    launch_lifecycle_manager_arg = DeclareLaunchArgument(
+        'launch_lifecycle_manager',
+        default_value='True',
+        description='launches lifecycle manager')
+    
     def create_full_path_configurations(context):
         map_file_path = os.path.join(
             this_pgk_dir,
@@ -70,22 +68,24 @@ def generate_launch_description():
         namespace_arg,
         autostart_arg,
         log_level_arg,
+        launch_lifecycle_manager_arg,
         environment_arg,
         create_map_yaml_filename_arg,
         Node(
             package='nav2_map_server',
             executable='map_server',
-            namespace=namespace_cfg,
+            namespace=namespace,
             output='screen',
             parameters=[{'yaml_filename': LaunchConfiguration('yaml_filename')}]),
         Node(
+            condition=IfCondition(launch_lifecycle_manager),
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',
-            namespace=namespace_cfg,
+            namespace=namespace,
             name='lifecycle_manager_map',
             output='screen',
-            arguments=['--ros-args', '--log-level', log_level_cfg],
-            parameters=[{'use_sim_time': use_sim_time_cfg},
-                        {'autostart': autostart_cfg},
+            arguments=['--ros-args', '--log-level', log_level],
+            parameters=[{'use_sim_time': use_sim_time},
+                        {'autostart': autostart},
                         {'node_names': lifecycle_nodes}])
     ])

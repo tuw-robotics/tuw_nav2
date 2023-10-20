@@ -17,12 +17,13 @@ def generate_launch_description():
     # Get the launch directory
     this_pgk_dir = get_package_share_directory('tuw_nav2')
   
-    use_sim_time_cfg = LaunchConfiguration('use_sim_time')
-    autostart_cfg = LaunchConfiguration('autostart')
-    log_level_cfg = LaunchConfiguration('log_level')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    autostart = LaunchConfiguration('autostart')
+    log_level = LaunchConfiguration('log_level')
+    launch_lifecycle_manager = LaunchConfiguration('launch_lifecycle_manager')
 
     # Declare the launch arguments
-    namespace_cfg = LaunchConfiguration('namespace')
+    namespace = LaunchConfiguration('namespace')
     namespace_arg = DeclareLaunchArgument(
         'namespace',
         default_value='',
@@ -69,6 +70,10 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
 
+    launch_lifecycle_manager_arg = DeclareLaunchArgument(
+        'launch_lifecycle_manager',
+        default_value='True',
+        description='launches lifecycle manager')
 
     def create_full_path_configurations(context):
         amcl_param_file_path = os.path.join(
@@ -94,23 +99,24 @@ def generate_launch_description():
                 package='nav2_amcl',
                 executable='amcl',
                 name='amcl',
-                namespace=namespace_cfg,
+                namespace=namespace,
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('amcl_param_file_path'),
                             LaunchConfiguration('amcl_init_param_file_path'),
-                            {'use_sim_time': use_sim_time_cfg}],
-                arguments=['--ros-args', '--log-level', log_level_cfg],
+                            {'use_sim_time': use_sim_time}],
+                arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(launch_lifecycle_manager),
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_localization',
-                namespace=namespace_cfg,
+                namespace=namespace,
                 output='screen',
-                arguments=['--ros-args', '--log-level', log_level_cfg],
-                parameters=[{'use_sim_time': use_sim_time_cfg},
-                            {'autostart': autostart_cfg},
+                arguments=['--ros-args', '--log-level', log_level],
+                parameters=[{'use_sim_time': use_sim_time},
+                            {'autostart': autostart},
                             {'node_names': lifecycle_nodes}])
         ]
     )
@@ -125,6 +131,7 @@ def generate_launch_description():
     ld.add_action(namespace_arg)
     ld.add_action(autostart_arg)
     ld.add_action(log_level_arg)
+    ld.add_action(launch_lifecycle_manager_arg)
     ld.add_action(vehilce_arg)
     #Opaque function call
     ld.add_action(create_full_path_configurations_arg)

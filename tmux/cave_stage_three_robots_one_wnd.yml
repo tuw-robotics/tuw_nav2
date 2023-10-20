@@ -1,0 +1,23 @@
+##enable named panes in tmux.conf with:
+#set -g pane-border-format "#{pane_index} #{pane_title}"
+#set -g pane-border-status bottom
+
+name: pioneer3dx
+#root: /home/markus/projects/tuw-ros
+
+windows:
+  - simulation:
+      layout: even-vertical
+      panes: 
+        - stage: 
+          - printf '\033]2;%s\033\\' 'stage'
+          - ros2 launch stage_ros2 stage.launch.py world:=cave_three_robots one_tf_tree:=false
+        - robot_0: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 bringup_launch.py use_sim_time:=true namespace:=robot_0 environment:=cave rviz_config:=nav2 multiple_lifecycle_manager:=False
+        - robot_1: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 bringup_launch.py use_sim_time:=true namespace:=robot_1 environment:=cave rviz_config:=nav2 multiple_lifecycle_manager:=False
+        - robot_2: 
+          - printf '\033]2;%s\033\\' 'navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 bringup_launch.py use_sim_time:=true namespace:=robot_2 environment:=cave rviz_config:=nav2 multiple_lifecycle_manager:=False  scan_src:=base_scan1

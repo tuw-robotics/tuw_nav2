@@ -20,13 +20,9 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
-from launch_ros.descriptions import ComposableNode
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetLaunchConfiguration
 from launch.launch_context import LaunchContext
-from launch import utilities
-from launch_ros.descriptions import ParameterFile
 from tuw_common.launch import RewrittenYaml
 from nav2_common.launch import ReplaceString
 
@@ -40,6 +36,7 @@ def generate_launch_description():
     autostart = LaunchConfiguration('autostart')
     log_level = LaunchConfiguration('log_level')
     namespace = LaunchConfiguration('namespace')
+    launch_lifecycle_manager = LaunchConfiguration('launch_lifecycle_manager')
      
 
     controller_server_yaml_arg  = DeclareLaunchArgument( 'controller_server_yaml',  default_value='controller_server_purepursuite.yaml')
@@ -81,6 +78,11 @@ def generate_launch_description():
     log_level_arg = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
+    
+    launch_lifecycle_manager_arg = DeclareLaunchArgument(
+        'launch_lifecycle_manager',
+        default_value='True',
+        description='launches lifecycle manager')
     
     def create_full_path_configurations(context: LaunchContext):
         
@@ -180,6 +182,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
+                condition=IfCondition(launch_lifecycle_manager),
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_navigation',
@@ -209,6 +212,7 @@ def generate_launch_description():
     ld.add_action(planner_server_yaml_arg)
     ld.add_action(autostart_arg)
     ld.add_action(log_level_arg)
+    ld.add_action(launch_lifecycle_manager_arg)
     
     #Opaque function call
     ld.add_action(create_full_path_configurations_arg)

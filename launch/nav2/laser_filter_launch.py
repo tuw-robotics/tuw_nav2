@@ -17,7 +17,7 @@ def generate_launch_description():
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
-        description='Use simulation (Gazebo) clock if true')
+        description='Use simulation clock if true')
     
     scan_src_arg = DeclareLaunchArgument(
         'scan_src',
