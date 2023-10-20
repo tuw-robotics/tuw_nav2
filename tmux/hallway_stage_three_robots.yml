@@ -17,7 +17,7 @@ windows:
       panes: 
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml namespace:=robot_0 scan_src:=base_scan scan_des:=scan
+          - ros2 launch tuw_nav2 laser_filter_launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml namespace:=robot_0 scan_src:=base_scan scan_des:=scan
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_0 config:=nav2_minimal
@@ -35,7 +35,7 @@ windows:
       panes: 
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true namespace:=robot_1 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
+          - ros2 launch tuw_nav2 laser_filter_launch.py use_sim_time:=true namespace:=robot_1 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_1 config:=nav2_minimal
@@ -53,7 +53,7 @@ windows:
       panes: 
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true namespace:=robot_2 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
+          - ros2 launch tuw_nav2 laser_filter_launch.py use_sim_time:=true namespace:=robot_2 filter_yaml:=shadow_filter_stage.yaml  scan_src:=base_scan scan_des:=scan
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true namespace:=robot_2 config:=nav2_minimal

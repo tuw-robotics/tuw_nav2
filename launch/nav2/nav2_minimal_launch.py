@@ -175,8 +175,8 @@ def generate_launch_description():
                 output='screen',
                 respawn_delay=2.0,
                 parameters=[LaunchConfiguration('bt_navigator_yaml_param_file_path'),
-                            {'use_sim_time': use_sim_time,
-                             'autostart': autostart}],
+                            {'use_sim_time': use_sim_time},
+                             {'autostart': autostart}],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(

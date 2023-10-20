@@ -17,7 +17,7 @@ windows:
           - ros2 launch tuw_gazebo_models robot_description.launch.py model_name:=robot0  robot:=pioneer3dx
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml scan_src:=base_scan
+          - ros2 launch tuw_nav2 laser_filter_launch.py use_sim_time:=true filter_yaml:=shadow_filter_stage.yaml scan_src:=base_scan
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py use_sim_time:=true config:=nav2

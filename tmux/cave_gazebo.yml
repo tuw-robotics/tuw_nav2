@@ -18,7 +18,7 @@ windows:
           - sleep 5; ros2 launch tuw_gazebo_models spawn_robot.launch.py model_name:=robot0  robot:=pioneer3dx  X:=-7.0 Y:=-7.0 Theta:=0.7
         - laser filter: 
           - printf '\033]2;%s\033\\' 'laser filter'
-          - ros2 launch tuw_nav2 laser_filter.launch.py
+          - ros2 launch tuw_nav2 laser_filter_launch.py
         - rviz: 
           - printf '\033]2;%s\033\\' 'rviz'
           - ros2 launch tuw_nav2 rviz_launch.py
