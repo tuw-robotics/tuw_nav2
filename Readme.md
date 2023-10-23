@@ -64,3 +64,8 @@ tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_gazebo.yml
 tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_ns.yml
 tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_three_robots_one_wnd.yml 
 ```
+
+## view on all vehicles
+```
+ros2 launch tuw_nav2 rviz_launch.py config:=multi_robot
+```
