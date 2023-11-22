@@ -15,7 +15,7 @@
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
-      robot_base_frame: <robot_namespace>/base_link
+      robot_base_frame: base_link
       use_sim_time: True
       robot_radius: 0.22
       resolution: 0.05
@@ -43,4 +43,4 @@
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
       always_send_full_costmap: True
-      map_topic: "/map"
+      map_topic: "/<robot_namespace>/map"

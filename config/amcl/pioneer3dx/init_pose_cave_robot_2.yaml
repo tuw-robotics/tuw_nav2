@@ -1,4 +1,0 @@
-/**/amcl:
-  ros__parameters:
-    initial_pose: {x: -5.0, y: -6.0, z: 0.0, yaw: -2.355}
-    set_initial_pose: true
