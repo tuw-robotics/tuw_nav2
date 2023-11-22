@@ -60,8 +60,8 @@
       use_sim_time: True
       update_frequency: 5.0
       publish_frequency: 2.0
-      global_frame: <robot_namespace>/odom
-      robot_base_frame: <robot_namespace>/base_link
+      global_frame: odom
+      robot_base_frame: base_link
       rolling_window: true
       width: 3
       height: 3

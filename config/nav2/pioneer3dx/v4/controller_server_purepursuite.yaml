@@ -60,8 +60,8 @@
       use_sim_time: True
       update_frequency: 5.0
       publish_frequency: 2.0
-      global_frame: <robot_namespace>/odom
-      robot_base_frame: <robot_namespace>/base_link
+      global_frame: odom
+      robot_base_frame: base_link
       rolling_window: true
       width: 3
       height: 3
@@ -96,4 +96,4 @@
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
       always_send_full_costmap: True
-      map_topic: "/map"
+      map_topic: "map"

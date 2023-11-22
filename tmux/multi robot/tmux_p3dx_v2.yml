@@ -1,0 +1,55 @@
+##enable named panes in tmux.conf with:
+#set -g pane-border-format "#{pane_index} #{pane_title}"
+#set -g pane-border-status bottom
+
+
+name: p3dx
+root: .
+
+windows:
+  - simulation:
+      layout: d94d,158x35,0,0[158x17,0,0[158x8,0,0{39x8,0,0,0,39x8,40,0,9,39x8,80,0,7,38x8,120,0,10},158x8,0,9,5],158x17,0,18,3]
+      panes: 
+        - gazebo: 
+          - printf '\033]2;%s\033\\' 'gazebo'
+          - ros2 launch tuw_gazebo world.launch.py room:=cave
+        - 1.robot description: 
+          - printf '\033]2;%s\033\\' '1.robot description'
+          - sleep 5; ros2 launch tuw_gazebo_models spawn_robot_v2.launch.py namespace:=r1 model_name:=robot1  robot:=pioneer3dx  X:=-6.0 Y:=-6.0 Theta:=0.7
+        - 2.robot description: 
+          - printf '\033]2;%s\033\\' '2.robot description'
+          - ros2 launch tuw_gazebo_models spawn_robot_v2.launch.py namespace:=r2 model_name:=robot2  robot:=pioneer3dx  X:=-6.0 Y:=6.0 Theta:=0.7  
+        - 1.laser filter: 
+          - printf '\033]2;%s\033\\' '1.laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py namespace:=r1
+        - 2.laser filter:
+          - printf '\033]2;%s\033\\' '2.laser filter'
+          - ros2 launch tuw_nav2 laser_filter.launch.py namespace:=r2
+        - 1.rviz: 
+          - printf '\033]2;%s\033\\' '1.rviz'
+          - ros2 launch tuw_nav2 rviz_launch_v2.py namespace:=r1
+        - 2.rviz: 
+          - printf '\033]2;%s\033\\' '2.rviz'
+          - ros2 launch tuw_nav2 rviz_launch_v2.py namespace:=r2
+        - 1.map_server:   
+          - printf '\033]2;%s\033\\' '1.map_server'
+          - ros2 launch tuw_nav2 map_server_launch_v2.py namespace:=r1
+        - 2.map_server:   
+          - printf '\033]2;%s\033\\' '2.map_server'
+          - ros2 launch tuw_nav2 map_server_launch_v2.py namespace:=r2
+        - 1.localization: 
+          - printf '\033]2;%s\033\\' '1.localization'
+          - ros2 launch tuw_nav2 localization_launch_v2.py namespace:=r1 init_pose_yaml:=init_pose_cave_robot1.yaml 
+        - 2.localization: 
+          - printf '\033]2;%s\033\\' '2.localization'
+          - ros2 launch tuw_nav2 localization_launch_v2.py namespace:=r2 init_pose_yaml:=init_pose_cave_robot2.yaml 
+        - 1. navigation: 
+          - printf '\033]2;%s\033\\' '1.navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch_v2.py namespace:=r1
+        - 2. navigation: 
+          - printf '\033]2;%s\033\\' '2.navigation'
+          - read -p "start nav2"; ros2 launch tuw_nav2 nav2_launch_v2.py namespace:=r2
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=nav2_params.yaml  bt_navigator_yaml:=nav2_params.yaml smoother_server_yaml:=nav2_params.yaml behavior_server_yaml:=nav2_params.yaml waypoint_follower_yaml:=nav2_params.yaml planner_server_yaml:=nav2_params.yaml velocity_smoother_yaml:=nav2_params.yaml
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_purepursuite.yaml
+          #- read -p "start nav2"; ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml
+          
