@@ -3,7 +3,7 @@ planner_server:
     plugins: ["GridBased"]
     use_sim_time: True
     GridBased:
-      plugin: "tuw_nav2_planner/StraightLine"
+      plugin: "tuw_planner_straight/StraightLine"
       interpolation_resolution: 0.1
 
 global_costmap:

@@ -64,13 +64,14 @@ ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_s
 
 starting the node planner_server extra
 ```
-ros2 launch tuw_nav2 nav2_default_launch.py controller_server_yaml:=controller_server_mppi.yaml planner_server_yaml:=empty
+ros2 launch tuw_nav2 nav2_minimal_launch.py controller_server_yaml:=controller_server_mppi.yaml planner_server_yaml:=empty
 ros2 run nav2_planner planner_server --ros-args --params-file ./ws02/src/tuw_nav2/config/nav2/pioneer3dx/v1/planner_server_line.yaml
 ```
 ## tmuxinator
 
 ```
 cd $WS
+tmuxinator start -p ./ws02/src/tuw_nav2/tmux/roblab_gazebo.yml
 tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_gazebo.yml
 tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_ns.yml
 tmuxinator start -p ./ws02/src/tuw_nav2/tmux/cave_stage_three_robots_one_wnd.yml 
