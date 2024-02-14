@@ -23,7 +23,7 @@ windows:
           - ros2 launch tuw_nav2 map_server_launch.py use_sim_time:=true environment:=straden namespace:=robot_0
         - localization: 
           - printf '\033]2;%s\033\\' 'localization'
-          - ros2 launch tuw_nav2 localization_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_straden.yaml vehilce:=pioneer3dx
+          - ros2 launch tuw_nav2 fake_localization_launch.py use_sim_time:=true namespace:=robot_0 init_pose_yaml:=init_pose_straden.yaml vehilce:=pioneer3dx
         - navigation: 
           - printf '\033]2;%s\033\\' 'navigation'
           - ros2 launch tuw_nav2 nav2_minimal_launch.py use_sim_time:=true namespace:=robot_0
