@@ -25,7 +25,6 @@ from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from nav2_common.launch import RewrittenYaml
 
-
 def generate_launch_description():
     # Get the launch directory
     bringup_dir = get_package_share_directory('tuw_nav2')
@@ -59,7 +58,10 @@ def generate_launch_description():
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {
         'use_sim_time': use_sim_time,
-        'autostart': autostart}
+        'autostart': autostart,
+        'default_nav_through_poses_bt_xml': get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml",
+        'default_nav_to_pose_bt_xml': get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml"
+    }
 
     configured_params = RewrittenYaml(
             source_file=params_file,
