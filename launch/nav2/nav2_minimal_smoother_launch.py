@@ -46,6 +46,8 @@ def generate_launch_description():
     behavior_server_yaml_cfg    = LaunchConfiguration('behavior_server_yaml')
     planner_server_yaml_arg     = DeclareLaunchArgument( 'planner_server_yaml',     default_value='planner_server.yaml')    
     planner_server_yaml_cfg     = LaunchConfiguration('planner_server_yaml')
+    smoother_server_yaml_arg     = DeclareLaunchArgument( 'smoother_server_yaml',     default_value='smoother_server.yaml')    
+    smoother_server_yaml_cfg     = LaunchConfiguration('smoother_server_yaml')
 
     vehilce_arg = DeclareLaunchArgument(
         'vehilce',
@@ -115,17 +117,20 @@ def generate_launch_description():
         bt_navigator_yaml_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['bt_navigator_yaml'])
         behavior_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['behavior_server_yaml'])
         planner_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['planner_server_yaml'])
+        smoother_server_param_rewritten = create_rewritten_yaml(context, context.launch_configurations['smoother_server_yaml'])
     
         return [SetLaunchConfiguration('controller_server_param_file_path', controller_server_param_rewritten),
                 SetLaunchConfiguration('bt_navigator_yaml_param_file_path', bt_navigator_yaml_param_rewritten),
                 SetLaunchConfiguration('behavior_server_param_file_path', behavior_server_param_rewritten),
                 SetLaunchConfiguration('planner_server_param_file_path', planner_server_param_rewritten),
+                SetLaunchConfiguration('smoother_server_param_file_path', smoother_server_param_rewritten),
             ]
 
     create_full_path_configurations_arg = OpaqueFunction(function=create_full_path_configurations)
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',
+                       'smoother_server',
                        'behavior_server',
                        'bt_navigator']
 
@@ -180,9 +185,20 @@ def generate_launch_description():
                 parameters=[LaunchConfiguration('bt_navigator_yaml_param_file_path'),
                             {'use_sim_time': use_sim_time},
                             {'autostart': autostart},
-                            {'default_nav_through_poses_bt_xml':get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml"},
-                            {'default_nav_to_pose_bt_xml': get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml"}
+                            {'default_nav_through_poses_bt_xml':get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/smoother/navigate_through_poses_w_replanning_and_recovery.xml"},
+                            {'default_nav_to_pose_bt_xml': get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/smoother/navigate_to_pose_w_replanning_and_recovery.xml"}
                             ],
+                arguments=['--ros-args', '--log-level', log_level],
+                remappings=remappings),
+            Node(
+                condition=IfCondition(PythonExpression( ["'", smoother_server_yaml_cfg, "' != 'empty'"]  )),
+                package='nav2_smoother',
+                executable='smoother_server',
+                name='smoother_server',
+                namespace=namespace,
+                output='screen',
+                respawn_delay=2.0,
+                parameters=[LaunchConfiguration('smoother_server_param_file_path')],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
             Node(
@@ -214,6 +230,7 @@ def generate_launch_description():
     ld.add_action(bt_navigator_yaml_arg)
     ld.add_action(behavior_server_yaml_arg)
     ld.add_action(planner_server_yaml_arg)
+    ld.add_action(smoother_server_yaml_arg)
     ld.add_action(autostart_arg)
     ld.add_action(log_level_arg)
     ld.add_action(launch_lifecycle_manager_arg)
