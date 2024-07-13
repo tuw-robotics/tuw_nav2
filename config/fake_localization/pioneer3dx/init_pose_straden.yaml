@@ -1,7 +1,7 @@
 /**/fake_localization_node:
   ros__parameters:
     offset:
-      x: 0.0
-      y: -32.0
+      x: -92.3
+      y: -38.0
       z: 0.0
-      yaw: 3.14
+      yaw: 0.0
