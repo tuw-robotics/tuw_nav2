@@ -1,7 +1,7 @@
 controller_server:
   ros__parameters:
     use_sim_time: True
-    controller_frequency: 30.0
+    controller_frequency: 20.0
     FollowPath:
       plugin: "nav2_mppi_controller::MPPIController"
       time_steps: 56
@@ -67,6 +67,7 @@ controller_server:
         threshold_to_consider: 0.5
         offset_from_furthest: 20
         use_path_orientations: false
+        forward_preference: true
       PathFollowCritic:
         enabled: true
         cost_power: 1
@@ -104,7 +105,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.55
+        inflation_radius: 0.30
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
