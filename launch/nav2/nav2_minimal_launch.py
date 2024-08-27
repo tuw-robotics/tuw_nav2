@@ -180,7 +180,7 @@ def generate_launch_description():
                 parameters=[LaunchConfiguration('bt_navigator_yaml_param_file_path'),
                             {'use_sim_time': use_sim_time},
                             {'autostart': autostart},
-                            {'default_nav_through_poses_bt_xml':get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml"},
+                            {'default_nav_through_poses_bt_xml':get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery_v3.xml"},
                             {'default_nav_to_pose_bt_xml': get_package_share_directory('tuw_nav2') + "/config/nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml"}
                             ],
                 arguments=['--ros-args', '--log-level', log_level],
